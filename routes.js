@@ -32,18 +32,18 @@ module.exports = function(app) {
     res.sendStatus(404);
   });
 
-  app.get('/events/*', function(req, res) {
-    res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
-  });
-  app.get('/user/*', function(req, res) {
-    res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
-  });
-  app.get('/404', function(req, res) {
-    res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
-  });
-  app.get('/', function(req, res) {
-    res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
-  });
+  // app.get('/events/*', function(req, res) {
+  //   res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
+  // });
+  // app.get('/user/*', function(req, res) {
+  //   res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
+  // });
+  // app.get('/404', function(req, res) {
+  //   res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
+  // });
+  // app.get('/', function(req, res) {
+  //   res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
+  // });
   
   // Handles any requests that don't match the ones above
 app.get('*', (req,res) =>{
