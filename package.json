@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "heroku-postbuild": "cd ng-events && npm install --only=dev && npm install && npm run build"
+    "heroku-postbuild1": "cd ng-events && npm install --only=dev && npm install && npm run build"
   },
   "author": "Jim Cooper",
   "license": "ISC",
@@ -18,9 +18,5 @@
     "express": "4.13.4",
     "express-session": "1.13.0",
     "morgan": "1.7.0"
-  },
-  "bugs": {
-    "url": "https://github.com/jmcooper/ngf-server/issues"
-  },
-  "homepage": "https://github.com/jmcooper/ngf-server#readme"
+  }
 }
