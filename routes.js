@@ -24,6 +24,7 @@ module.exports = function(app) {
     res.end();
   });
   
+
   app.get('/app/*', function(req, res) {
     res.sendStatus(404);
   });
