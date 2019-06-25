@@ -45,8 +45,9 @@ module.exports = function(app) {
     res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
   });
   
-  app.get('*', function(req, res) {
-    console.log('404 error', req.path);
-    res.sendStatus(404);
-  });
+  // Handles any requests that don't match the ones above
+app.get('*', (req,res) =>{
+  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+});
+
 }
