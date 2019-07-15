@@ -3,18 +3,30 @@ var users = require('../database/users'),
 
 var nextId = getNextId(users);
 
-exports.updateUser = function(req, res) {
-  var updatedUser = req.body;
+exports.updateUser = function(req, res, next) {
+  
+  req.user.firstName = req.body.firstName;
+  req.user.lastName = req.body.lastName;
 
-  var foundUser = users.find(user => user.id === parseInt(req.params.id));
-  if(foundUser) {
-    foundUser.firstName = updatedUser.firstName;
-    foundUser.lastName = updatedUser.lastName;
-  }
+  req.user.save(function(err) {
+    if (err) { return next(err); }
 
-  res.send(foundUser);
-  res.end();
+    res.json({ ...res.user });
+  });
 }
+
+// exports.updateUser = function(req, res) {
+//   var updatedUser = req.body;
+
+//   var foundUser = users.find(user => user.id === parseInt(req.params.id));
+//   if(foundUser) {
+//     foundUser.firstName = updatedUser.firstName;
+//     foundUser.lastName = updatedUser.lastName;
+//   }
+
+//   res.send(foundUser);
+//   res.end();
+// }
 
 exports.createUser = function(req, res) {
   var newUser = req.body;

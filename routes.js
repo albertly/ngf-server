@@ -3,21 +3,30 @@ var auth = require('./auth'),
   users = require('./controllers/userController');
   path = require('path');
 
+//const Authentication = require('./controllers/authentication');
+const passportService = require('./services/passport');
+const passport = require('passport');
+
+const requireAuth = passport.authenticate('jwt', { session: false });
+const requireSignin = passport.authenticate('local', { session: false });
+  
 var fs = require('fs');
 
 
 module.exports = function(app) {
 
-  app.post('/api/login', auth.authenticate);
+  app.post('/api/login', requireSignin, auth.authenticate);
+  app.post('/api/signup', auth.signup);
+
   app.get('/api/currentIdentity', auth.getCurrentIdentity);
-  app.put('/api/users/:id', users.updateUser);
+  app.put('/api/users/:id', requireAuth, users.updateUser);
   
   app.get('/api/events', events.getEvents);
   app.get('/api/events/:eventId', events.getEvent);
-  app.post('/api/events', events.saveEvent);
+  app.post('/api/events', requireAuth, events.saveEvent);
   app.get('/api/sessions/search', events.searchSessions);
-  app.delete('/api/events/:eventId/sessions/:sessionId/voters/:voterId', events.deleteVoter);
-  app.post('/api/events/:eventId/sessions/:sessionId/voters/:voterId', events.addVoter);
+  app.delete('/api/events/:eventId/sessions/:sessionId/voters/:voterId', requireAuth, events.deleteVoter);
+  app.post('/api/events/:eventId/sessions/:sessionId/voters/:voterId', requireAuth, events.addVoter);
   
   app.post('/api/logout', function(req, res) {
     req.logout();
