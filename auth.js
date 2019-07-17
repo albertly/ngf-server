@@ -1,4 +1,5 @@
 var passport = require('passport');
+const bcrypt = require('bcrypt-nodejs');
 const jwt = require('jwt-simple');
 const config = require('./config');
 const User = require('./models/user');
@@ -29,6 +30,19 @@ exports.signup = function (req, res, next) {
   if (!email || !password) {
     return res.status(422).send({ error: 'You must provide email and password' });
   }
+
+  // generate a salt then run callback
+  bcrypt.genSalt(10, function (err, salt) {
+    if (err) { return next(err); }
+
+    // hash (encrypt) our password using the salt
+    bcrypt.hash(user.password, salt, null, function (err, hash) {
+      if (err) { return next(err); }
+
+      // overwrite plain text password with encrypted password
+      user.password = hash;
+    });
+  });
 
   // See if a user with the given email exists
   User.findOne({ email: email }, function (err, existingUser) {
