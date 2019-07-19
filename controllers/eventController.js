@@ -2,15 +2,32 @@ var events = require('../database/events'),
   getNextId = require('./getNextId'),
   url = require('url');
 
+const Event = require('../models/event');  
+
 var nextId = getNextId(events);
 
 exports.getEvents = function(req, res) {
-  res.send(events);
+
+  // test
+    Event.find({}, function (err, allEvents) {
+      if (err) { return next(err); }
+  
+      console.log('allEvents', allEvents);
+      res.status(200).json(allEvents);
+  
+    });
+  // end test
+  
 }
 
 exports.getEvent = function(req, res) {
-  var event = events.find(event => event.id === +req.params.eventId);
-  res.send(event);
+  Event.findById(req.params.eventId, function (err, result) {
+    if (err) { return next(err); }
+    console.log('res', result);
+    res.status(200).json(result);
+  });
+  //var event = events.find(event => event.id === +req.params.eventId);
+  //res.send(event);
 }
 
 exports.searchSessions = function(req, res) {
