@@ -7,17 +7,11 @@ const Event = require('../models/event');
 var nextId = getNextId(events);
 
 exports.getEvents = function(req, res) {
-
-  // test
     Event.find({}, function (err, allEvents) {
       if (err) { return next(err); }
-  
-      console.log('allEvents', allEvents);
       res.status(200).json(allEvents);
   
     });
-  // end test
-  
 }
 
 exports.getEvent = function(req, res) {
@@ -26,8 +20,6 @@ exports.getEvent = function(req, res) {
     console.log('res', result);
     res.status(200).json(result);
   });
-  //var event = events.find(event => event.id === +req.params.eventId);
-  //res.send(event);
 }
 
 exports.searchSessions = function(req, res) {
@@ -69,19 +61,23 @@ exports.addVoter = function(req, res) {
 }
 
 exports.saveEvent = function(req, res) {
-  var event = req.body;
-  
-  if (event.id) {
-    var index = events.findIndex(e => e.id === event.id)
-    events[index] = event
+  const eventReq = req.body;
+
+  if (eventReq._id) {
+    Event.findById(eventReq._id, function (err, result) {
+      if (err){ return next(err); }
+      res.status(200).json(result);
+    });
   } else {
-    event.id = nextId;
-    nextId++;
-    event.sessions = [];
-    events.push(event);
+    const event = new Event({
+      ...eventReq, sessions: []
+    });
+    event.save(function (err, result) {
+      if (err) { return next(err); }
+      // Repond to request indicating the user was created
+      res.status(200).json(result);
+    });
   }
-  res.send(event);
-  res.end(); 
 }
 
 
