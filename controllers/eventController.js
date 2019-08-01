@@ -38,15 +38,19 @@ exports.searchSessions = function (req, res) {
 
 exports.deleteVoter = function (req, res) {
   var voterId = req.params.voterId,
-    sessionId = parseInt(req.params.sessionId),
-    eventId = parseInt(req.params.eventId);
+    sessionId = req.params.sessionId,
+    eventId = req.params.eventId;
+  let session = {};
 
-
-  var session = events.find(event => event.id === eventId)
-    .sessions.find(session => session.id === sessionId)
-
-  session.voters = session.voters.filter(voter => voter !== voterId);
-  res.send(session);
+  const options = { new: true };
+  Event.findOneAndUpdate({ "_id": eventId, "sessions.id": sessionId },
+    { $pull: { "sessions.$.voters": voterId }}, options)
+    .then(result => {
+      const event = result.toObject();
+      session = event.sessions.find(session => session.id === +sessionId)
+      res.send(session);
+    })
+    .catch(err => console.log('err', err));
 }
 
 exports.addVoter = function (req, res) {
@@ -57,7 +61,7 @@ exports.addVoter = function (req, res) {
 
   const options = { new: true };
   Event.findOneAndUpdate({ "_id": eventId, "sessions.id": sessionId },
-    { $push: { "sessions.$.voters": voterId } }, options)
+    { $push: { "sessions.$.voters": voterId }}, options)
     .then(result => {
       const event = result.toObject();
       session = event.sessions.find(session => session.id === +sessionId)
