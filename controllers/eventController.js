@@ -1,23 +1,18 @@
-var events = require('../database/events'),
-  getNextId = require('./getNextId'),
-  url = require('url');
+var events = require('../database/events');
 
 const Event = require('../models/event');
 
-var nextId = getNextId(events);
 
 exports.getEvents = function (req, res) {
   Event.find({}, function (err, allEvents) {
     if (err) { return next(err); }
     res.status(200).json(allEvents);
-
   });
 }
 
 exports.getEvent = function (req, res) {
   Event.findById(req.params.eventId, function (err, result) {
     if (err) { return next(err); }
-    console.log('res', result);
     res.status(200).json(result);
   });
 }
@@ -36,15 +31,17 @@ exports.searchSessions = function (req, res) {
   res.send(results);
 }
 
-exports.deleteVoter = function (req, res) {
+exports.voterAction = function (req, res) {
   var voterId = req.params.voterId,
     sessionId = req.params.sessionId,
     eventId = req.params.eventId;
   let session = {};
 
+  const action = req.method === 'DELETE' ? '$pull' : '$push';
+
   const options = { new: true };
   Event.findOneAndUpdate({ "_id": eventId, "sessions.id": sessionId },
-    { $pull: { "sessions.$.voters": voterId }}, options)
+    { [action]: { "sessions.$.voters": voterId }}, options)
     .then(result => {
       const event = result.toObject();
       session = event.sessions.find(session => session.id === +sessionId)
@@ -53,30 +50,15 @@ exports.deleteVoter = function (req, res) {
     .catch(err => console.log('err', err));
 }
 
-exports.addVoter = function (req, res) {
-  var voterId = req.params.voterId,
-    sessionId = req.params.sessionId,
-    eventId = req.params.eventId;
-  let session = {};
-
-  const options = { new: true };
-  Event.findOneAndUpdate({ "_id": eventId, "sessions.id": sessionId },
-    { $push: { "sessions.$.voters": voterId }}, options)
-    .then(result => {
-      const event = result.toObject();
-      session = event.sessions.find(session => session.id === +sessionId)
-      res.send(session);
-    })
-    .catch(err => console.log('err', err));
-}
 
 exports.saveEvent = function (req, res) {
   const eventReq = req.body;
 
   if (eventReq._id) {
+    // To do: what to do when found
     Event.findById(eventReq._id, function (err, result) {
       if (err) { return next(err); }
-      res.status(200).json(result);
+      res.status(409).json(result);
     });
   } else {
     const event = new Event({
@@ -85,7 +67,7 @@ exports.saveEvent = function (req, res) {
     event.save(function (err, result) {
       if (err) { return next(err); }
       // Repond to request indicating the user was created
-      res.status(200).json(result);
+      res.status(201).json(result);
     });
   }
 }

@@ -25,8 +25,8 @@ module.exports = function(app) {
   app.get('/api/events/:eventId', events.getEvent);
   app.post('/api/events', requireAuth, events.saveEvent);
   app.get('/api/sessions/search', events.searchSessions);
-  app.delete('/api/events/:eventId/sessions/:sessionId/voters/:voterId', requireAuth, events.deleteVoter);
-  app.post('/api/events/:eventId/sessions/:sessionId/voters/:voterId', requireAuth, events.addVoter);
+  app.delete('/api/events/:eventId/sessions/:sessionId/voters/:voterId', requireAuth, events.voterAction);
+  app.post('/api/events/:eventId/sessions/:sessionId/voters/:voterId', requireAuth, events.voterAction);
   
   app.post('/api/logout', function(req, res) {
     req.logout();
