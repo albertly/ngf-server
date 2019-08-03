@@ -20,15 +20,41 @@ exports.getEvent = function (req, res) {
 exports.searchSessions = function (req, res) {
   var term = req.query.search.toLowerCase();
   var results = [];
-  events.forEach(event => {
-    var matchingSessions = event.sessions.filter(session => session.name.toLowerCase().indexOf(term) > -1)
-    matchingSessions = matchingSessions.map(session => {
-      session.eventId = event.id;
-      return session;
+
+  Event.aggregate([
+    {
+      "$unwind": "$sessions"
+    },
+    {
+      $match: {
+        "sessions.name": {
+          "$regex": term,
+          "$options": "i"
+        }
+      }
+    },
+    
+    {
+      $project: {
+        _id: "$_id",
+        "sessions": 1
+      }
+    }
+  ])
+  .then(result => {
+    results = result.map(item => {
+        return {
+           eventId : item._id.toString(),
+           ...item.sessions
+        }
     })
-    results = results.concat(matchingSessions);
+    res.send(results);
   })
-  res.send(results);
+  .catch(err => {
+    console.log('err', err);
+    res.status(500).send(err);
+  });
+  
 }
 
 exports.voterAction = function (req, res) {
@@ -47,7 +73,10 @@ exports.voterAction = function (req, res) {
       session = event.sessions.find(session => session.id === +sessionId)
       res.send(session);
     })
-    .catch(err => console.log('err', err));
+    .catch(err => {
+      console.log('err', err);
+      res.status(500).send(err);
+    });
 }
 
 
