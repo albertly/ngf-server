@@ -22,7 +22,7 @@ exports.authenticate = function (req, res, next) {
 
 exports.signup = function (req, res, next) {
   const email = req.body.email;
-  const password = req.body.password;
+  let password = req.body.password;
   const userName = req.body.userName;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
@@ -36,11 +36,11 @@ exports.signup = function (req, res, next) {
     if (err) { return next(err); }
 
     // hash (encrypt) our password using the salt
-    bcrypt.hash(user.password, salt, null, function (err, hash) {
+    bcrypt.hash(password, salt, null, function (err, hash) {
       if (err) { return next(err); }
 
       // overwrite plain text password with encrypted password
-      user.password = hash;
+      password = hash;
     });
   });
 
@@ -66,7 +66,13 @@ exports.signup = function (req, res, next) {
       if (err) { return next(err); }
 
       // Repond to request indicating the user was created
-      res.json({ token: tokenForUser(user) });
+      res.json({ 
+        token: tokenForUser(user),
+        email: email,
+        userName: userName,
+        firstName: firstName,
+        lastName: lastName
+       });
     });
   });
 }

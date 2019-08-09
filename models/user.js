@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt-nodejs');
 
 // Define our model
 const userSchema = new Schema({
-  email: { type: String, unique: true, lowercase: true },
+  email: { type: String, unique: true, lowercase: true, trim: true, match: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/},
   password: String,
   userName: String,
   firstName: String,
