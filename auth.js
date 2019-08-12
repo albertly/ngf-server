@@ -1,13 +1,9 @@
 var passport = require('passport');
 const bcrypt = require('bcrypt-nodejs');
-const jwt = require('jwt-simple');
-const config = require('./config');
-const User = require('./models/user');
 
-function tokenForUser(user) {
-  const timestamp = new Date().getTime();
-  return jwt.encode({ sub: user.id, iat: timestamp }, config.secret);
-}
+const User = require('./models/user');
+const tokenForUser = require('./utils/token.utils');
+
 
 // super important that you use "username" in the body.
 exports.authenticate = function (req, res, next) {

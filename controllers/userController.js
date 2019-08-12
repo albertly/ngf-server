@@ -1,6 +1,7 @@
 var users = require('../database/users'),
   getNextId = require('./getNextId');
 
+const User = require('../models/user');
 var nextId = getNextId(users);
 
 exports.updateUser = function(req, res, next) {
@@ -42,4 +43,41 @@ exports.createUser = function(req, res) {
 exports.getUsers = function(req, res) {
   res.send(users);
   res.end();
+}
+
+
+exports.upsertGoogleUser = function (accessToken, refreshToken, profile, cb) {
+
+  console.log('profile', profile)
+  return User.findOne({ 'googleProvider.id': profile.id })
+      .then(user => {
+          if (!user) {
+              var newUser = new User({
+                  email: profile.emails[0].value,
+                  userName: profile.displayName,
+                  firstName: profile.name.givenName,
+                  lastName: profile.name.familyName,
+                  googleProvider: {
+                      id: profile.id,
+                      token: accessToken
+                  }
+              });
+
+              newUser.save(function (error, savedUser) {
+                  if (error) {
+                      console.log(error);
+                  }
+                  return cb(error,
+                      {...savedUser, userName: profile.displayName, firstName: profile.name.givenName, lastName: profile.name.familyName});
+              });
+          } else {
+              return cb(null,
+                  {...user, email: profile.emails[0].value, userName: profile.displayName, firstName: profile.name.givenName, lastName: profile.name.familyName});
+          }
+      }
+      )
+      .catch(err => {
+          console.log('Error upsert', err);
+          return cb(err, null);
+      });
 }

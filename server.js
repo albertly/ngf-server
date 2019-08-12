@@ -9,7 +9,7 @@ const morgan = require('morgan');
 const config = require('./config');
 
 var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-var  port = process.env.PORT || 5000
+var  port = process.env.PORT || 8080
 
 
 var app = express();
@@ -23,7 +23,14 @@ mongoose.connect(config.mongo);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ type: '*/*' }));
 app.use(morgan('combined'));
-app.use(cors());
+
+var corsOption = {
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    exposedHeaders: ['x-auth-token']
+};
+app.use(cors(corsOption));
 //require('./passport')();
 
 require('./routes')(app);
