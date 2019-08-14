@@ -19,7 +19,6 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 // DB Setup
 mongoose.connect(config.mongo); 
 
-//require('./expressConfig')(app);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ type: '*/*' }));
 app.use(morgan('combined'));

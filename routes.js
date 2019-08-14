@@ -36,14 +36,11 @@ module.exports = function(app) {
   });
   
   app.post('/api/google',passport.authenticate('google-token', {session: false}), function(req, res) {
-      console.log('Start');
+    
       if (!req.user) {
           return res.send(401, 'User Not Authenticated');
       }
-      console.log('req.user', req.user);
-      req.auth = {
-          id: req.user.id
-      };
+
       token = tokenForUser(req.user)
       res.setHeader('x-auth-token', token);
       res.status(200).send(JSON.stringify(req.user));
