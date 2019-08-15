@@ -1,6 +1,6 @@
-var express = require('express');
+const express = require('express');
 const path = require('path');
-var cors = require('cors');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const http = require('http');
@@ -8,11 +8,11 @@ const morgan = require('morgan');
 
 const config = require('./config');
 
-var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
-var  port = process.env.PORT || 8080
+const env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+const  port = process.env.PORT || 8080
 
 
-var app = express();
+const app = express();
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 
@@ -30,7 +30,6 @@ var corsOption = {
     exposedHeaders: ['x-auth-token']
 };
 app.use(cors(corsOption));
-//require('./passport')();
 
 require('./routes')(app);
 const server = http.createServer(app);

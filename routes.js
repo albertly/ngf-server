@@ -1,26 +1,18 @@
-var auth = require('./auth'),
-  events = require('./controllers/eventController'),
-  users = require('./controllers/userController');
-  path = require('path');
-
-//const Authentication = require('./controllers/authentication');
-const passportService = require('./services/passport');
+const  path = require('path');
 const passport = require('passport');
 
-const tokenForUser = require('./utils/token.utils');
+const  events = require('./controllers/eventController');
+const  users = require('./controllers/userController');
 const requireAuth = passport.authenticate('jwt', { session: false });
 const requireSignin = passport.authenticate('local', { session: false });
-require('./passport')();
-
-var fs = require('fs');
+require('./services/passport');
 
 
 module.exports = function(app) {
 
-  app.post('/api/login', requireSignin, auth.authenticate);
-  app.post('/api/signup', auth.signup);
+  app.post('/api/login', requireSignin, users.authenticate);
+  app.post('/api/signup', users.signup);
 
-  app.get('/api/currentIdentity', auth.getCurrentIdentity);
   app.put('/api/users/:id', requireAuth, users.updateUser);
   
   app.get('/api/events', events.getEvents);
@@ -35,16 +27,7 @@ module.exports = function(app) {
     res.end();
   });
   
-  app.post('/api/google',passport.authenticate('google-token', {session: false}), function(req, res) {
-    
-      if (!req.user) {
-          return res.send(401, 'User Not Authenticated');
-      }
-
-      token = tokenForUser(req.user)
-      res.setHeader('x-auth-token', token);
-      res.status(200).send(JSON.stringify(req.user));
-  });
+  app.post('/api/google',passport.authenticate('google-token', {session: false}), users.authGoogleUser);
 
   app.get('/app/*', function(req, res) {
     res.sendStatus(404);
@@ -54,19 +37,6 @@ module.exports = function(app) {
     res.sendStatus(404);
   });
 
-  // app.get('/events/*', function(req, res) {
-  //   res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
-  // });
-  // app.get('/user/*', function(req, res) {
-  //   res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
-  // });
-  // app.get('/404', function(req, res) {
-  //   res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
-  // });
-  // app.get('/', function(req, res) {
-  //   res.sendFile(path.resolve(__dirname + '/../../dist/index.html'));
-  // });
-  
   // Handles any requests that don't match the ones above
 app.get('/events/*', (req,res) =>{
   res.sendFile(path.join(__dirname+'/client/build/index.html'));
