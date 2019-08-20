@@ -10,6 +10,14 @@ exports.getEvents = function (req, res) {
   });
 }
 
+exports.deleteEvent = function (req, res) {
+  Event.findByIdAndRemove(req.params.eventId, function (err, result) {
+    if (err) { return next(err); };
+    if (!result) {return res.status(404).send('')};
+    res.status(200).send(result);
+  });
+}
+
 exports.getEvent = function (req, res) {
   Event.findById(req.params.eventId, function (err, result) {
     if (err) { return next(err); }

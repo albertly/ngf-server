@@ -1,10 +1,11 @@
 const passport = require('passport');
-const User = require('../models/user');
-const config = require('../config');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const LocalStrategy = require('passport-local');
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
+
+const User = require('../models/user'); // const User = mongoose.model('users');
+const config = require('../config');
 const userController = require('../controllers/userController');
 
 // Create local strategy

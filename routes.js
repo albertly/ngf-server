@@ -17,6 +17,7 @@ module.exports = function(app) {
   app.put('/api/users/:id', requireAuth, users.updateUser);
   
   app.get('/api/events', events.getEvents);
+  app.delete('/api/events/:eventId',  requireAuth, authorization.requireAdmin, events.deleteEvent);
   app.get('/api/events/:eventId', events.getEvent);
   app.post('/api/events', requireAuth, authorization.requireAdmin, events.saveEvent);
   app.get('/api/sessions/search', events.searchSessions);
