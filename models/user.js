@@ -16,7 +16,7 @@ const userSchema = new Schema({
     },
     select: false
   },
-  roles: { type: String,  lowercase: true, trim: true }
+  roles: { type: String,  lowercase: true, trim: true, default: '' }
 });
 
 

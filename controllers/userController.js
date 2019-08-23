@@ -10,6 +10,7 @@ exports.authenticate = function (req, res, next) {
     userName: req.user.userName,
     firstName: req.user.firstName,
     lastName: req.user.lastName,
+    roles: req.user.roles,
   });
 };
 
