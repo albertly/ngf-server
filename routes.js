@@ -10,7 +10,7 @@ require('./services/passport');
 
 
 module.exports = function(app) {
-
+  //test 
   app.post('/api/login', requireSignin, users.authenticate);
   app.post('/api/signup', users.signup);
 
