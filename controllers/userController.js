@@ -1,3 +1,4 @@
+const paginate = require('express-paginate');
 const User = require('../models/user');
 const tokenForUser = require('../utils/token.utils');
 const bcrypt = require('bcrypt-nodejs');
@@ -83,6 +84,38 @@ exports.updateUser = function(req, res, next) {
     res.end(); 
   });
 }
+
+// exports.getUsers = function(req, res) {
+//   return User.find({}, { password: 0, googleProvider: 0 })
+//          .then(result => res.status(200).send(result));
+// }
+
+exports.getUsers = async (req, res, next) => {
+
+  try {
+     const [ results, itemCount ] = await Promise.all([
+      User.find({}, { password: 0, googleProvider: 0 }).limit(req.query.limit).skip(req.skip).lean().exec(),
+      User.count({})
+    ]);
+
+    const pageCount = Math.ceil(itemCount / req.query.limit);
+    
+    if (req.query.page > pageCount) {
+      res.status(400).send('Wrong page number');
+      return;
+    }
+    res.json({      
+      nextPage: paginate.hasNextPages(req)(pageCount) ? paginate.href(req)(true) : '',
+      previousPage: req.query.page > 1 ? paginate.href(req)(true) : '',
+      pageCount,
+      page: req.query.page,
+      data: results
+    });
+
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.authGoogleUser = function(req, res) {
     

@@ -14,6 +14,7 @@ module.exports = function(app) {
   app.post('/api/login', requireSignin, users.authenticate);
   app.post('/api/signup', users.signup);
 
+ 
   app.put('/api/users/:id', requireAuth, users.updateUser);
   
   app.get('/api/events', events.getEvents);
@@ -44,4 +45,7 @@ app.get('/events/*', (req,res) =>{
   res.sendFile(path.join(__dirname+'/client/build/index.html'));
 });
 
+const paginate = require('express-paginate');
+app.use(paginate.middleware(1, 50));
+app.get('/api/users', users.getUsers);
 }
