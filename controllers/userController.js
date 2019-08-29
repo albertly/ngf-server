@@ -85,16 +85,14 @@ exports.updateUser = function(req, res, next) {
   });
 }
 
-// exports.getUsers = function(req, res) {
-//   return User.find({}, { password: 0, googleProvider: 0 })
-//          .then(result => res.status(200).send(result));
-// }
+
 
 exports.getUsers = async (req, res, next) => {
 
   try {
      const [ results, itemCount ] = await Promise.all([
-      User.find({}, { password: 0, googleProvider: 0 }).limit(req.query.limit).skip(req.skip).lean().exec(),
+      User.find({}, {email:1, userName:1, firstName:1, lastName:1, roles:1,googleProvider:1})
+      .limit(req.query.limit).skip(req.skip).lean().exec(),
       User.count({})
     ]);
 
@@ -109,7 +107,7 @@ exports.getUsers = async (req, res, next) => {
       previousPage: req.query.page > 1 ? paginate.href(req)(true) : '',
       pageCount,
       page: req.query.page,
-      data: results
+      data: results.map(d =>  ({...d, googleProvider: d.googleProvider ? 1 : 0 }))
     });
 
   } catch (err) {
