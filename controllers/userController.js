@@ -74,6 +74,12 @@ exports.signup = function (req, res, next) {
 
 exports.updateUser = function(req, res, next) {
   
+  if (req.user.googleProvider) {
+    res.status(406).send("Cannot update third party OAuth user");
+    res.end();
+    return;
+  }
+
   req.user.firstName = req.body.firstName;
   req.user.lastName = req.body.lastName;
 
