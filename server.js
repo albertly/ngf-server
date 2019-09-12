@@ -32,6 +32,7 @@ var corsOption = {
 app.use(cors(corsOption));
 
 require('./routes')(app);
+require('./billingRoutes')(app);
 const server = http.createServer(app);
 server.listen(port);
 console.log('Listening on port ' + port + '...');
