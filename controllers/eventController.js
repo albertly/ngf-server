@@ -1,5 +1,3 @@
-var events = require('../database/events');
-
 const Event = require('../models/event');
 
 
