@@ -20,6 +20,8 @@ config.js
 .env.test.local
 .env.production.local
 
+dev.js
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

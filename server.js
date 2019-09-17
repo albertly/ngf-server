@@ -6,9 +6,11 @@ const bodyParser = require('body-parser');
 const http = require('http');
 const morgan = require('morgan');
 
-const config = require('./config');
-
 const env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
+const config = require('./config/keys');
+
+
 const  port = process.env.PORT || 8080
 
 

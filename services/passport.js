@@ -5,7 +5,7 @@ const LocalStrategy = require('passport-local');
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
 
 const User = require('../models/user'); // const User = mongoose.model('users');
-const config = require('../config');
+const config = require('../config/keys');
 const userController = require('../controllers/userController');
 
 // Create local strategy

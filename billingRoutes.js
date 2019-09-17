@@ -1,6 +1,6 @@
 const passport = require('passport');
 
-const keys = require('./config');
+const keys = require('./config/keys');
 const stripe = require('stripe')(keys.stripe.secretKey);
 //const requireLogin = require('../middlewares/requireLogin');
 
