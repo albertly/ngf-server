@@ -11,7 +11,7 @@ exports.getEvents = function (req, res) {
 exports.deleteEvent = function (req, res) {
   Event.findByIdAndRemove(req.params.eventId, function (err, result) {
     if (err) { return next(err); };
-    if (!result) {return res.status(404).send('')};
+    if (!result) { return res.status(404).send('') };
     res.status(200).send(result);
   });
 }
@@ -39,7 +39,7 @@ exports.searchSessions = function (req, res) {
         }
       }
     },
-    
+
     {
       $project: {
         _id: "$_id",
@@ -47,20 +47,20 @@ exports.searchSessions = function (req, res) {
       }
     }
   ])
-  .then(result => {
-    results = result.map(item => {
+    .then(result => {
+      results = result.map(item => {
         return {
-           eventId : item._id.toString(),
-           ...item.sessions
+          eventId: item._id.toString(),
+          ...item.sessions
         }
+      })
+      res.send(results);
     })
-    res.send(results);
-  })
-  .catch(err => {
-    console.log('err', err);
-    res.status(500).send(err);
-  });
-  
+    .catch(err => {
+      console.log('err', err);
+      res.status(500).send(err);
+    });
+
 }
 
 exports.voterAction = function (req, res) {
@@ -73,7 +73,7 @@ exports.voterAction = function (req, res) {
 
   const options = { new: true };
   Event.findOneAndUpdate({ "_id": eventId, "sessions.id": sessionId },
-    { [action]: { "sessions.$.voters": voterId }}, options)
+    { [action]: { "sessions.$.voters": voterId } }, options)
     .then(result => {
       const event = result.toObject();
       session = event.sessions.find(session => session.id === +sessionId)
@@ -91,9 +91,17 @@ exports.saveEvent = function (req, res) {
 
   if (eventReq._id) {
     // To do: what to do when found
-    Event.findById(eventReq._id, function (err, result) {
+    Event.findById(eventReq._id, function (err, doc) {
       if (err) { return next(err); }
-      res.status(409).json(result);
+      // res.status(409).json(result);
+      doc.sessions = eventReq.sessions;
+      // Event.findByIdAndUpdate(eventReq._id, )
+
+      doc.save(function (err, result) {
+        if (err) { return next(err); }
+        res.status(201).json(result);
+      });
+
     });
   } else {
     const event = new Event({
