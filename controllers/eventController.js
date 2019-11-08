@@ -99,7 +99,7 @@ exports.saveEvent = function (req, res) {
 
       doc.save(function (err, result) {
         if (err) { return next(err); }
-        res.status(201).json(result);
+        res.status(200).json(result);
       });
 
     });
