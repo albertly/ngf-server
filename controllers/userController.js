@@ -1,7 +1,11 @@
+var crypto = require('crypto');
+
 const paginate = require('express-paginate');
 const User = require('../models/user');
 const tokenForUser = require('../utils/token.utils');
 const bcrypt = require('bcrypt-nodejs');
+const sendMail = require('../utils/sendMail.util');
+const keys = require('../config/keys');
 
 // super important that you use "username" in the body.
 exports.authenticate = function (req, res, next) {
@@ -48,26 +52,47 @@ exports.signup = function (req, res, next) {
       return res.status(422).send({ error: 'Email is in use' });
     }
 
+    //generate authentication token
+    const seed = crypto.randomBytes(20);
+    const authToken = crypto.createHash('sha1').update(seed + email).digest('hex');
+
     // If a user with email does NOT exist, create and save user record
     const user = new User({
-      email: email,
-      password: password,
-      userName: userName,
-      firstName: firstName,
-      lastName: lastName
+      email,
+      password,
+      userName,
+      firstName,
+      lastName,
+      authToken
     });
 
     user.save(function (err) {
       if (err) { return next(err); }
 
-      // Repond to request indicating the user was created
-      res.json({ 
-        token: tokenForUser(user),
-        email: email,
-        userName: userName,
-        firstName: firstName,
-        lastName: lastName
-       });
+      const link="http://"+req.get('host')+"/verify?id="+authToken;
+
+      const to = 'albert.lyubarsky@gmail.com'; //email;
+      const from = keys.sendgrid.sendgrid_from;
+      const subject = 'Please confirm your Email account';
+      const text = 'a';
+      const html = 'Hello,<br> Please Click on the link to verify your email.<br><a href="'+ link + '">Click here to verify</a>';
+
+     // 
+      sendMail(to, from, subject, text, html).then(result => {
+        // Repond to request indicating the user was created
+        console.log(result);
+        res.json({ 
+          token: tokenForUser(user),
+          email: email,
+          userName: userName,
+          firstName: firstName,
+          lastName: lastName
+        })
+      }).catch(
+        err => console.log(err)
+      );
+
+
     });
   });
 }
