@@ -97,6 +97,11 @@ exports.signup = function (req, res, next) {
   });
 }
 
+exports.deleteUser = function(req, res, next) {
+  req.user.remove();
+  return res.status(204).send();
+}
+
 exports.updateUser = function(req, res, next) {
   
   if (req.user.googleProvider) {

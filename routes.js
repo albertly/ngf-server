@@ -14,7 +14,7 @@ module.exports = function(app) {
   app.post('/api/login', requireSignin, users.authenticate);
   app.post('/api/signup', users.signup);
 
- 
+  app.delete('/api/users/:id', requireAuth, users.deleteUser)
   app.put('/api/users/:id', requireAuth, users.updateUser);
   
   app.get('/api/events', events.getEvents);
