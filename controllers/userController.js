@@ -97,9 +97,12 @@ exports.signup = function (req, res, next) {
   });
 }
 
+// ToDo: get id param from body, check if admin
 exports.deleteUser = function(req, res, next) {
-  req.user.remove();
-  return res.status(204).send();
+  User.findByIdAndRemove(req.params.id, function (err, result) {
+    if (err) { return next(err); }
+    res.status(204).send();
+  });
 }
 
 exports.updateUser = function(req, res, next) {
