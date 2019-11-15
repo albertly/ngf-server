@@ -52,6 +52,7 @@ exports.signup = function (req, res, next) {
       return res.status(422).send({ error: 'Email is in use' });
     }
 
+    //ToDo: Token should be asymetric encrypted 
     //generate authentication token
     const seed = crypto.randomBytes(20);
     const authToken = crypto.createHash('sha1').update(seed + email).digest('hex');
@@ -69,7 +70,7 @@ exports.signup = function (req, res, next) {
     user.save(function (err) {
       if (err) { return next(err); }
 
-      const link="http://"+req.get('host')+"/verify?id="+authToken;
+      const link="http://"+req.get('host')+"/api/verify/"+ authToken;
 
       const to = 'albert.lyubarsky@gmail.com'; //email;
       const from = keys.sendgrid.sendgrid_from;
@@ -97,7 +98,27 @@ exports.signup = function (req, res, next) {
   });
 }
 
-// ToDo: get id param from body, check if admin
+exports.verify = function(req, res, next) {
+  User.findOne({ authToken: req.params.id }, function (err, user) {
+    if (err) { return next(err); }
+
+    if (user) {
+      user.emailConfirmed = true;
+
+      user.save(function(err) {
+        if (err) { return next(err); }
+    
+        return res.status(204).send();
+      });
+    }
+    else {
+     return res.status(422).send({ error: 'Something went wrong' });
+    }
+
+  });
+}
+
+// ToDo: get id param from body, check if admin, cannot delete himself
 exports.deleteUser = function(req, res, next) {
   User.findByIdAndRemove(req.params.id, function (err, result) {
     if (err) { return next(err); }

@@ -16,7 +16,8 @@ module.exports = function(app) {
 
   app.delete('/api/users/:id', requireAuth, users.deleteUser)
   app.put('/api/users/:id', requireAuth, users.updateUser);
-  
+  app.get('/api/verify/:id', users.verify);
+
   app.get('/api/events', events.getEvents);
   app.delete('/api/events/:eventId',  requireAuth, authorization.requireAdmin, events.deleteEvent);
   app.get('/api/events/:eventId', events.getEvent);
