@@ -16,6 +16,9 @@ jobs:
 
     working_directory: ~/repo
 
+    env:
+      - NODE_ENV=ci
+      
     steps:
       - checkout
 
