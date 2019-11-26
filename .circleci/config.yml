@@ -36,4 +36,4 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       # run tests!
-      - run: NODE_ENV=ci npm start
+      - run: npm start
