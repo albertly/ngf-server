@@ -18,7 +18,7 @@ jobs:
 
     env:
       - NODE_ENV=ci
-      
+
     steps:
       - checkout
 
@@ -35,6 +35,5 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-
       # run tests!
-      #- run: npm start
+      - run: npm start
