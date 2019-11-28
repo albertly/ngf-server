@@ -7,6 +7,7 @@ const stripe = require('stripe')(keys.stripe.secretKey);
 const requireAuth = passport.authenticate('jwt', { session: false });
 const Order = require('./models/order');
 const Event = require('./models/event');
+const User = require('./models/user');
 
 module.exports = app => {
   app.post('/api/stripe', requireAuth, async (req, res) => {
@@ -39,9 +40,18 @@ module.exports = app => {
       purchaseDate: new Date(),
     });
 
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      res.status(500).send("User not found. Something wrong");
+    }
+
+    user.orders.push(order);
+
     let newOrder = {};
     try {
       newOrder = await order.save();
+      await user.save();
     }
     catch(err) {
       return res.status(500).send(err);

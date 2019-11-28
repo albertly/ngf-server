@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const orderSchema = new Schema({
-    userId: { type: Schema.ObjectId, unique: false },
-    eventId: { type: Schema.ObjectId, unique: false },
+    userId: { type: Schema.ObjectId, unique: false, ref: 'user' },
+    eventId: { type: Schema.ObjectId, unique: false, ref: 'event' },
     purchaseDate :  { type: Date, unique: false },
   });
 

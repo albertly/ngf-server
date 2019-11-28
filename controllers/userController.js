@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt-nodejs');
 const paginate = require('express-paginate');
 
 const User = require('../models/user');
+const Order = require('../models/order');
+const Event = require('../models/event');
 const tokenForUser = require('../utils/token.utils');
 const sendMail = require('../utils/sendMail.util');
 const keys = require('../config/keys');
@@ -100,6 +102,21 @@ exports.signup = function (req, res, next) {
 
     });
   });
+}
+
+
+
+exports.getUser = async function(req, res, next) {
+  try {
+    const user = await User.findOne({_id: req.params.id}).populate({
+      path: 'orders',
+      populate: {path: 'eventId'}
+    });
+    return res.send(user);
+  }
+  catch(err) {
+    return res.status(500).send(err);
+  }
 }
 
 exports.verify = function (req, res, next) {

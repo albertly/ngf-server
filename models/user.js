@@ -18,7 +18,8 @@ const userSchema = new Schema({
   },
   roles: { type: String,  lowercase: true, trim: true, default: '' },
   emailConfirmed: false,
-  authToken: String
+  authToken: String,
+  orders: [{ type: Schema.Types.ObjectId, ref: 'order' }]
 });
 
 
