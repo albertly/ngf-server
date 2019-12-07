@@ -90,7 +90,7 @@ exports.signup = function (req, res, next) {
         // Repond to request indicating the user was created
         console.log(result);
         res.json({
-  //        token: tokenForUser(user),
+          //        token: tokenForUser(user),
           email: email,
           userName: userName,
           firstName: firstName,
@@ -106,15 +106,15 @@ exports.signup = function (req, res, next) {
 
 
 
-exports.getUser = async function(req, res, next) {
+exports.getUser = async function (req, res, next) {
   try {
-    const user = await User.findOne({_id: req.params.id}).populate({
+    const user = await User.findOne({ _id: req.params.id }).populate({
       path: 'orders',
-      populate: {path: 'eventId'}
+      populate: { path: 'eventId' }
     });
     return res.send(user);
   }
-  catch(err) {
+  catch (err) {
     return res.status(500).send(err);
   }
 }
@@ -166,7 +166,51 @@ exports.updateUser = function (req, res, next) {
   });
 }
 
+exports.updateUserEx = async function (req, res, next) {
 
+  try {
+
+    if ( req.params.id !== req.body.id ) {
+      res.status(400).send("Invalid User ID");
+      return;
+    }
+
+    const user = await User.findOne({ _id: req.params.id });
+
+    if (user.googleProvider) {
+      if (req.body.email || req.body.emailConfirmed) {
+        res.status(406).send("Cannot update email of third party OAuth user");
+        res.end();
+        return;
+      }
+    }
+
+    if (req.body.firstName) user.firstName = req.body.firstName;
+
+    if (req.body.lastName) user.lastName = req.body.lastName;
+
+    if (req.body.email) user.email = req.body.email;
+
+    if (req.body.userName) user.userName = req.body.userName;
+
+    if (req.body.roles) user.roles = req.body.roles;
+
+    if (req.body.emailConfirmed) user.emailConfirmed = req.body.emailConfirmed;
+
+
+    user.save(function (err) {
+      if (err) { return next(err); }
+
+      res.send(user);
+      res.end();
+      return;
+    });
+  }
+  catch (err) {
+    return res.status(500).send(err);
+  }
+
+}
 
 exports.getUsers = async (req, res, next) => {
 
