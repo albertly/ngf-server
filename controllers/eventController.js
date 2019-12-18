@@ -1,12 +1,19 @@
 const Event = require('../models/event');
 
 
-exports.getEvents = function (req, res) {
-  Event.find({}, function (err, allEvents) {
-    if (err) { return next(err); }
-    res.status(200).json(allEvents);
-  });
+exports.getEvents = async function (req, res) {
+  let events = null;
+  try {
+     events = await Event.find({}).cache({ key: '0' });
+  }
+  catch (err
+    ) {
+    return next(err);
+  }
+
+  res.status(200).json(events);
 }
+
 
 exports.deleteEvent = function (req, res) {
   Event.findByIdAndRemove(req.params.eventId, function (err, result) {

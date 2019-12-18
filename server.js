@@ -10,6 +10,8 @@ const env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 const config = require('./config/keys');
 
+require('./services/cache');
+mongoose.Promise = global.Promise;
 
 const  port = process.env.PORT || 8080
 

@@ -26,6 +26,7 @@
     "passport-google-token": "^0.1.2",
     "passport-jwt": "^4.0.0",
     "passport-local": "1.0.0",
+    "redis": "^2.8.0",
     "stripe": "^7.8.0"
   }
 }
