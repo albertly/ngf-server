@@ -24,7 +24,10 @@ function eventController(Event) {
 
   const getEvent = (req, res) => {
     Event.findById(req.params.eventId, function (err, result) {
-      if (err) { return next(err); }
+      if (err) {
+        // ToDo: Log error
+        return res.status(500).send("Error 500");
+      }
       res.status(200).json(result);
     });
   }
@@ -69,26 +72,36 @@ function eventController(Event) {
 
   }
 
-  const voterAction = (req, res) => {
-    var voterId = req.params.voterId,
+  const voterAction = async (req, res) => {
+    const voterId = req.params.voterId,
       sessionId = req.params.sessionId,
       eventId = req.params.eventId;
     let session = {};
 
+    if (!voterId || !sessionId || !eventId) {
+      res.status(400);
+      return res.send('One of the mandaory parameters is missing');
+    }
+
     const action = req.method === 'DELETE' ? '$pull' : '$push';
 
     const options = { new: true };
-    Event.findOneAndUpdate({ "_id": eventId, "sessions.id": sessionId },
-      { [action]: { "sessions.$.voters": voterId } }, options)
-      .then(result => {
-        const event = result.toObject();
-        session = event.sessions.find(session => session.id === +sessionId)
-        res.send(session);
-      })
-      .catch(err => {
-        console.log('err', err);
-        res.status(500).send(err);
-      });
+
+    try {
+      const result = await Event.findOneAndUpdate({ "_id": eventId, "sessions.id": sessionId },
+        { [action]: { "sessions.$.voters": voterId } }, options)
+
+
+      const event = result.toObject();
+      session = event.sessions.find(session => session.id === +sessionId);
+      return res.send(session);
+    }
+    catch (err) {
+      //ToDo: add logging
+      console.log('err', err);
+      return res.status(500).send(err);
+    }
+
   }
 
 
