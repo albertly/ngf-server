@@ -1,7 +1,9 @@
 const  path = require('path');
 const passport = require('passport');
 
-const  events = require('./controllers/eventController');
+const Event = require('./models/event');
+const  events = require('./controllers/eventController')(Event);
+
 const  users = require('./controllers/userController');
 const authorization = require('./services/authorization');
 const requireAuth = passport.authenticate('jwt', { session: false });
