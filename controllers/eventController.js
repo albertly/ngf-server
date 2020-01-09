@@ -4,11 +4,12 @@ const Event = require('../models/event');
 exports.getEvents = async function (req, res) {
   let events = null;
   try {
-     events = await Event.find({}).cache({ key: '0' });
+    events = await Event.find({}).cache({ key: '0' });
   }
-  catch (err
-    ) {
-    return next(err);
+  catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+    // return next(err);
   }
 
   res.status(200).json(events);
