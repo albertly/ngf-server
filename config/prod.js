@@ -13,5 +13,10 @@ module.exports = {
     sendgrid: {
         sendgrid_api_key: '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',
         sendgrid_from: 'albert.lyubarsky@gmail.com'
+    },
+    redis: {
+        host: '',
+        port: '',
+        auth: ''
     }
 }
