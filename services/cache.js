@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const redis = require('redis');
 const util = require('util');
+const { performance } = require('perf_hooks');
+
 const keys = require('../config/keys');
 
 const client = redis.createClient({host:keys.redis.host, port:keys.redis.port, password:keys.redis.auth,
@@ -24,7 +26,11 @@ const client = redis.createClient({host:keys.redis.host, port:keys.redis.port, p
 }
 });
 
-client.on("error", function (err) {
+client.on('ready', () => {
+  console.log('Redis is ready. Happy caching!');
+});
+
+client.on("error",  (err) =>  {
   console.log("Chache Error " + err);
 });
 
@@ -48,11 +54,18 @@ mongoose.Query.prototype.exec = async function() {
     })
   );
 
+  let t0=0, t1=0;
+
+  t0 = performance.now();
+
   // See if we have a value for 'key' in redis
   const cacheValue = await client.hget(this.hashKey, key);
 
+  t1 = performance.now();
+
   // If we do, return that
   if (cacheValue) {
+    console.log(`Call to cached key ${key} took ${(t1 - t0)} milliseconds.`);
     const doc = JSON.parse(cacheValue);
 
     return Array.isArray(doc)
@@ -60,8 +73,12 @@ mongoose.Query.prototype.exec = async function() {
       : new this.model(doc);
   }
 
+  t0 = performance.now();
   // Otherwise, issue the query and store the result in redis
   const result = await exec.apply(this, arguments);
+
+  t1 = performance.now();
+  console.log(`Call to non-cached key ${key} took ${(t1 - t0)} milliseconds.`);
 
   client.hset(this.hashKey, key, JSON.stringify(result), 'EX', 10);
 
