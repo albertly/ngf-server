@@ -31,7 +31,7 @@ client.on('ready', () => {
 });
 
 client.on("error",  (err) =>  {
-  console.log("Chache Error " + err);
+  console.log("Cache Error " + err);
 });
 
 client.hget = util.promisify(client.hget);
