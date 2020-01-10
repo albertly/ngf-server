@@ -15,7 +15,7 @@ module.exports = {
         sendgrid_from: 'albert.lyubarsky@gmail.com'
     },
     redis: {
-        host: 'albertly.redis.cache.windows.net',
+        host: 'albertly.redis.cache.windows.net1',
         port: '6379',
         auth: 'C0p1nESMgfb1AN3X51eYQqagxuyiEePBMYchCeuA6DE='
     }
