@@ -1,3 +1,11 @@
+// Sinon stubbing
+// var db = require('../db');
+// var sinon = require('sinon');
+//
+// sinon.stub(db, "find").yields(null, {id: 1});
+//
+// https://scotch.io/tutorials/test-a-node-restful-api-with-mocha-and-chai
+
 process.env.NODE_ENV = 'CI';
 
 //const should = require('should');
