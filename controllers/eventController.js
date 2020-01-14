@@ -106,32 +106,38 @@ function eventController(Event) {
   }
 
 
-  const saveEvent = (req, res) => {
+  const saveEvent = async (req, res) => {
     const eventReq = req.body;
 
     if (eventReq._id) {
-      // To do: what to do when found
-      Event.findById(eventReq._id, function (err, doc) {
-        if (err) { return next(err); }
-        // res.status(409).json(result);
+
+      try {
+        const doc = await Event.findById(eventReq._id);
+
         doc.sessions = eventReq.sessions;
-        // Event.findByIdAndUpdate(eventReq._id, )
 
         doc.save(function (err, result) {
           if (err) { return next(err); }
-          res.status(200).json(result);
+          res.status(200);
+          return res.json(result);          
         });
+      }
+      catch (e) {
+        res.status(500);
+        return res.json("Error finding event: " + e);
+      }
 
-      });
     } else {
       const event = new Event({
         ...eventReq, sessions: []
       });
-      event.save(function (err, result) {
-        if (err) { return next(err); }
-        // Repond to request indicating the user was created
-        res.status(201).json(result);
-      });
+      const result = await event.save();
+
+      //if (err) { return next(err); 
+      // Repond to request indicating the user was created
+      res.status(201);
+      return res.json(result);      
+
     }
   }
 

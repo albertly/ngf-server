@@ -99,6 +99,51 @@ describe('Event Controller Tests:', () => {
                     done();
                 });
         });
+
+
+        it('it should POST new event when no id', async () => {
+            
+            const event = require('../database/events')[0];
+            
+            const req = {
+                body: event
+            };
+    
+            const res = {
+                status: sinon.spy(),
+                send: sinon.spy(),
+                json: sinon.spy()
+            }
+            const controller = eventController(Event);
+            await controller.saveEvent(req,res);
+            
+            res.status.calledWith(201).should.equal(true);
+            res.json.args[0][0]._id.should.exist;            
+
+        });
+
+
+        it('it should throw when POST new event when id and id doesnt exist', async () => {
+            
+            const event = require('../database/events')[0];
+            
+            event._id =  '41224d776a326fb40f000001';
+            const req = {
+                body: event
+            };
+    
+            const res = {
+                status: sinon.spy(),
+                send: sinon.spy(),
+                json: sinon.spy()
+            }
+            const controller = eventController(Event);
+            await controller.saveEvent(req,res);
+            
+            res.status.calledWith(500).should.equal(true);            
+
+        });
+
     });
 
 });
