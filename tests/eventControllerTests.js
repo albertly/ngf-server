@@ -23,11 +23,25 @@ const eventController = require('../controllers/eventController');
 chai.use(chaiHttp);
 
 describe('Event Controller Tests:', () => {
-    beforeEach((done) => { //Before each test we empty the database
-         Event.remove({}, (err) => { 
-            done();           
-         });        
-     });
+    let res = null;
+    let controller = null;
+    const event = require('../database/events')[0];
+
+    beforeEach((done) => {
+        //Before each test we empty the database
+        Event.remove({}, (err) => {
+            done();
+        });
+
+        res = {
+            status: sinon.spy(),
+            send: sinon.spy(),
+            json: sinon.spy()
+        }
+
+        controller = eventController(Event);
+
+    });
 
     it('should not allow empty parameters on voterAction', async () => {
         const Event = function () {
@@ -48,12 +62,6 @@ describe('Event Controller Tests:', () => {
                 voterId: null
             }
         };
-
-        const res = {
-            status: sinon.spy(),
-            send: sinon.spy(),
-            json: sinon.spy()
-        }
 
         const e = new Event();
         const controller = eventController(e);
@@ -89,61 +97,38 @@ describe('Event Controller Tests:', () => {
                 });
         });
 
-        it.skip('it should GET all the events another time', (done) => {
-               
-            const requester = chai.request(server); 
-            requester.get('/api/events')
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('array');
-                    done();
-                });
-        });
-
 
         it('it should POST new event when no id', async () => {
-            
-            const event = require('../database/events')[0];
-            
-            const req = {
-                body: event
-            };
-    
-            const res = {
-                status: sinon.spy(),
-                send: sinon.spy(),
-                json: sinon.spy()
-            }
-            const controller = eventController(Event);
-            await controller.saveEvent(req,res);
-            
+
+            const req = { body: event };
+
+            await controller.saveEvent(req, res);
+
             res.status.calledWith(201).should.equal(true);
-            res.json.args[0][0]._id.should.exist;            
+            res.json.args[0][0]._id.should.exist;
 
         });
 
+        it('should return 404 on POST new event, when id and id doesn\'t exist in db', async () => {
 
-        it('it should throw when POST new event when id and id doesnt exist', async () => {
-            
-            const event = require('../database/events')[0];
-            
-            event._id =  '41224d776a326fb40f000001';
-            const req = {
-                body: event
-            };
-    
-            const res = {
-                status: sinon.spy(),
-                send: sinon.spy(),
-                json: sinon.spy()
-            }
-            const controller = eventController(Event);
-            await controller.saveEvent(req,res);
-            
-            res.status.calledWith(500).should.equal(true);            
+            const localEvent = { ...event };
+            localEvent._id = '41224d776a326fb40f000001';
+            const req = { body: localEvent };
+
+            await controller.saveEvent(req, res);
+
+            res.status.calledWith(404).should.equal(true);
 
         });
 
+        it('should return 404 on Delete event when doesn\'t exist', async () => {
+
+            const req = { params: { eventId: '41224d776a326fb40f000001' } };
+
+            await controller.deleteEvent(req, res);
+
+            res.status.calledWith(404).should.equal(true);
+
+        });
     });
-
 });
