@@ -1,7 +1,7 @@
 module.exports = {
     secret: 'albert',
-    //mongo: 'mongodb+srv://dbUser:taligent31@cluster0-3jbil.mongodb.net/auth_ci',
-    mongo: 'mongodb://localhost:27017/auth',
+     //mongo: 'mongodb+srv://dbUser:taligent31@cluster0-3jbil.mongodb.net/auth_ci',
+     mongo: 'mongodb://localhost:27017/auth_ci',
     googleAuth: {
         clientID: '100046837471-ghjok7nacijtqdis9rbrnc2mua2n3rh4.apps.googleusercontent.com',
         clientSecret: 'SuOd9J8AgK8BFvzP-7D0LtI7',
@@ -15,8 +15,8 @@ module.exports = {
         sendgrid_from: 'albert.lyubarsky@gmail.com'
     },
     redis: {
-        host: 'albertly.redis.cache.windows.net1',
-        port: '6379',
-        auth: 'C0p1nESMgfb1AN3X51eYQqagxuyiEePBMYchCeuA6DE='
+        host: '',
+        port: '',
+        auth: ''
     }
 }

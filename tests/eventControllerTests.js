@@ -30,7 +30,7 @@ describe('Event Controller Tests:', () => {
     beforeEach((done) => {
         //Before each test we empty the database
         Event.remove({}, (err) => {
-            done();
+            
         });
 
         res = {
@@ -41,6 +41,7 @@ describe('Event Controller Tests:', () => {
 
         controller = eventController(Event);
 
+        done();
     });
 
     it('should not allow empty parameters on voterAction', async () => {
