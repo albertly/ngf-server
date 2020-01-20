@@ -15,19 +15,35 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const should = chai.should();
 
+const passport = require('passport');
 const Event = require('../models/event');
-const server = require('../server');
+const authorization = require('../services/authorization');
 const eventController = require('../controllers/eventController');
 
 
 chai.use(chaiHttp);
 
 describe('Event Controller Tests:', () => {
-    beforeEach((done) => { //Before each test we empty the database
-         Event.remove({}, (err) => { 
-            done();           
-         });        
-     });
+    let res = null;
+    let controller = null;
+    const event = require('../database/events')[0];
+
+    beforeEach((done) => {
+        //Before each test we empty the database
+        Event.remove({}, (err) => {
+            
+        });
+
+        res = {
+            status: sinon.spy(),
+            send: sinon.spy(),
+            json: sinon.spy()
+        }
+
+        controller = eventController(Event);
+
+        done();
+    });
 
     it('should not allow empty parameters on voterAction', async () => {
         const Event = function () {
@@ -48,12 +64,6 @@ describe('Event Controller Tests:', () => {
                 voterId: null
             }
         };
-
-        const res = {
-            status: sinon.spy(),
-            send: sinon.spy(),
-            json: sinon.spy()
-        }
 
         const e = new Event();
         const controller = eventController(e);
@@ -78,6 +88,27 @@ describe('Event Controller Tests:', () => {
     //ToDo: Problem working with Redis
     describe('/api/events book', () => {
 
+        let stubAuth = null;
+        let server = null;
+
+        before(() => {
+            stubAuth = sinon.stub(passport, 'authenticate')
+            .returns((req, res,done) => {
+                done(null, {user:'albert'});
+            });
+
+            sinon.stub(authorization, 'requireAdmin').callsFake((req, res, done) => {
+               return done();
+            });
+
+            server = require('../server');
+            
+        })
+
+        after(() => {
+            server.close();
+        })
+
         it('it should GET all the events', (done) => {
             chai.request(server)
                 .get('/api/events')
@@ -89,16 +120,54 @@ describe('Event Controller Tests:', () => {
                 });
         });
 
-        it.skip('it should GET all the events another time', (done) => {
-               
+
+        it('it should POST new event when no id', async () => {
+
+            const req = { body: event };
+
+            await controller.saveEvent(req, res);
+
+            res.status.calledWith(201).should.equal(true);
+            res.json.args[0][0]._id.should.exist;
+
+        });
+
+        it('should return 404 on POST new event, when id and id doesn\'t exist in db', async () => {
+
+            const localEvent = { ...event };
+            localEvent._id = '41224d776a326fb40f000001';
+            const req = { body: localEvent };
+
+            await controller.saveEvent(req, res);
+
+            res.status.calledWith(404).should.equal(true);
+
+        });
+
+        it('should return 404 on Delete event when doesn\'t exist', async () => {
+
+            const req = { params: { eventId: '41224d776a326fb40f000001' } };
+
+            await controller.deleteEvent(req, res);
+
+            res.status.calledWith(404).should.equal(true);
+
+        });
+
+        it('it should POST Event', (done) => {
+           
             const requester = chai.request(server); 
-            requester.get('/api/events')
+            requester.post('/api/events')
+                .send(event)                
                 .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('array');
+
+                    stubAuth.called.should.be.true;
+                   
                     done();
                 });
+
+            
         });
     });
-
+    
 });

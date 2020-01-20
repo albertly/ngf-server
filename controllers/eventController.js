@@ -15,13 +15,22 @@ function eventController(Event) {
   }
 
 
-  const deleteEvent = (req, res) => {
-    Event.findByIdAndRemove(req.params.eventId, function (err, result) {
-      if (err) { return next(err); };
-      if (!result) { return res.status(404).send('') };
+  const deleteEvent = async (req, res) => {
+
+    try {
+      const result = await Event.findByIdAndRemove(req.params.eventId);
+      if (!result) {
+        res.status(404)
+        return res.send('Event Id not found');
+      };
       res.status(200).send(result);
-    });
+    }
+    catch (e) {
+      res.status(500);
+      return res.send('Error deleting event ' + e);
+    }
   }
+
 
   const getEvent = (req, res) => {
     Event.findById(req.params.eventId, function (err, result) {
@@ -106,32 +115,48 @@ function eventController(Event) {
   }
 
 
-  const saveEvent = (req, res) => {
+  const saveEvent = async (req, res) => {
+
     const eventReq = req.body;
 
     if (eventReq._id) {
-      // To do: what to do when found
-      Event.findById(eventReq._id, function (err, doc) {
-        if (err) { return next(err); }
-        // res.status(409).json(result);
+
+      try {
+        const doc = await Event.findById(eventReq._id);
+
+        if (!doc) {
+          res.status(404);
+          return res.send("Event Id not founc");
+        }
+
         doc.sessions = eventReq.sessions;
-        // Event.findByIdAndUpdate(eventReq._id, )
 
         doc.save(function (err, result) {
           if (err) { return next(err); }
-          res.status(200).json(result);
+          res.status(200);
+          return res.json(result);
         });
+      }
+      catch (e) {
+        res.status(500);
+        return res.json("Error finding event: " + e);
+      }
 
-      });
     } else {
       const event = new Event({
         ...eventReq, sessions: []
       });
-      event.save(function (err, result) {
-        if (err) { return next(err); }
+      try {
+        const result = await event.save();
         // Repond to request indicating the user was created
-        res.status(201).json(result);
-      });
+        res.status(201);
+        return res.json(result);
+      }
+      catch (e) {
+        res.status(500);
+        return res.json("Error saving event: " + e);
+      }
+
     }
   }
 
