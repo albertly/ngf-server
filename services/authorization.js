@@ -1,7 +1,7 @@
 const User = require('../models/user');
 
 module.exports.requireAdmin = function (req, res, next) {
-    
+
     if (req.user.roles === 'admin') {
         next();
     }

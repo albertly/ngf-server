@@ -115,13 +115,19 @@ function eventController(Event) {
   }
 
 
-  const saveEvent = async (req, res) => {
+  const saveEvent = (req, res) => {
+
     const eventReq = req.body;
 
     if (eventReq._id) {
 
       try {
-        const doc = await Event.findById(eventReq._id);
+        const doc =  Event.findById(eventReq._id);
+
+        if (!doc) {
+          res.status(404);
+          return res.send("Event Id not founc");
+        }
 
         if (!doc) {
           res.status(404);
@@ -145,7 +151,7 @@ function eventController(Event) {
       const event = new Event({
         ...eventReq, sessions: []
       });
-      const result = await event.save();
+      const result =  event.save();
 
       //if (err) { return next(err); 
       // Repond to request indicating the user was created
