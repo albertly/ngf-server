@@ -15,8 +15,9 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const should = chai.should();
 
+const passport = require('passport');
 const Event = require('../models/event');
-const server = require('../server');
+const authorization = require('../services/authorization');
 const eventController = require('../controllers/eventController');
 
 
@@ -87,6 +88,27 @@ describe('Event Controller Tests:', () => {
     //ToDo: Problem working with Redis
     describe('/api/events book', () => {
 
+        let stubAuth = null;
+        let server = null;
+
+        before(() => {
+            stubAuth = sinon.stub(passport, 'authenticate')
+            .returns((req, res,done) => {
+                done(null, {user:'albert'});
+            });
+
+            sinon.stub(authorization, 'requireAdmin').callsFake((req, res, done) => {
+               return done();
+            });
+
+            server = require('../server');
+            
+        })
+
+        after(() => {
+            server.close();
+        })
+
         it('it should GET all the events', (done) => {
             chai.request(server)
                 .get('/api/events')
@@ -131,5 +153,21 @@ describe('Event Controller Tests:', () => {
             res.status.calledWith(404).should.equal(true);
 
         });
+
+        it('it should POST Event', (done) => {
+           
+            const requester = chai.request(server); 
+            requester.post('/api/events')
+                .send(event)                
+                .end((err, res) => {
+
+                    stubAuth.called.should.be.true;
+                   
+                    done();
+                });
+
+            
+        });
     });
+    
 });
