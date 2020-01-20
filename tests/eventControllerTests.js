@@ -15,10 +15,14 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const should = chai.should();
 
-const Event = require('../models/event');
-const server = require('../server');
-const eventController = require('../controllers/eventController');
+const passport = require('passport');
+const requireAuth = passport.authenticate('jwt', { session: false });
+const authorization = require('../services/authorization');
 
+const Event = require('../models/event');
+
+const eventController = require('../controllers/eventController');
+const ExtractJwt = require('passport-jwt').ExtractJwt;
 
 chai.use(chaiHttp);
 
@@ -109,26 +113,45 @@ describe('Event Controller Tests:', () => {
 
         });
 
-        it('should return 404 on POST new event, when id and id doesn\'t exist in db', async () => {
+        it.only('it should POST Event', (done) => {
+            // const stub1 = sinon.stub(passport, 'authenticate').
+            //     callsFake((strategy, options, callback) => {
+            //         console.log("in stub");
+            //         callback(null, {"username": "albertly@comtec.co.il"}, null);
+            //         return (req, res, next) => {};
+            //     });
+            let server = require('../server');
+            const stub = sinon.stub(server.pass.passport);
+            //    sinon.spy(server.pass.passport, 'authenticate');
+            //     sinon.spy(server.server, 'listen');
+             //   const requireAuth = passport.authenticate('jwt', { session: false });
+             //   sinon.spy(requireAuth);
 
-            const localEvent = { ...event };
-            localEvent._id = '41224d776a326fb40f000001';
-            const req = { body: localEvent };
+                
+            //returns(() => {user: 'albert'});
+            //stub1.authenticate.returns(true);
 
-            await controller.saveEvent(req, res);
+          //  const stub2 = sinon.stub(ExtractJwt);
+           // stub2.requireAdmin.returns(true);
+           
+           const events = require('../database/events');
 
-            res.status.calledWith(404).should.equal(true);
+            const requester = chai.request(server.server); 
+            requester.post('/api/events')
+                .send(events[0])                
+                .end((err, res) => {
+                    //res.should.have.status(200);
+                    //res.body.should.be.a('array');
+                    const t = server.pass.requireAuth;
+                   // server.server.listen.called.should.be.true;
+                    //server.pass.passport.authenticate.called.should.be.true;
+                    stub.authenticate.called.should.be.true;
+                   // requireAuth.called.should.be.true;
+                    done();
+                });
 
-        });
-
-        it('should return 404 on Delete event when doesn\'t exist', async () => {
-
-            const req = { params: { eventId: '41224d776a326fb40f000001' } };
-
-            await controller.deleteEvent(req, res);
-
-            res.status.calledWith(404).should.equal(true);
-
+            
         });
     });
-});
+
+//});
