@@ -13,7 +13,7 @@ const config = require('./config/keys');
 require('./services/cache');
 mongoose.Promise = global.Promise;
 
-const port = process.env.PORT || 8080
+const  port = process.env.PORT || 8080
 
 
 const app = express();
@@ -21,7 +21,7 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 // DB Setup
-mongoose.connect(config.mongo);
+mongoose.connect(config.mongo); 
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ type: '*/*' }));
@@ -35,14 +35,11 @@ var corsOption = {
 };
 app.use(cors(corsOption));
 
-const pass = require('./routes')(app);
+require('./routes')(app);
 require('./billingRoutes')(app);
 require('./utilRoutes')(app);
 const server = http.createServer(app);
 server.listen(port);
 console.log('Listening on port ' + port + '...');
 
-module.exports = {
-    server,
-    pass
-}; // for testing
+module.exports = server; // for testing
