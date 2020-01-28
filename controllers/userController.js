@@ -106,7 +106,7 @@ exports.signup = function (req, res, next) {
 
 
 
-exports.getUser = async function (req, res, next) {
+exports.getUser = async function (req, res) {
   try {
     const user = await User.findOne({ _id: req.params.id }).populate({
       path: 'orders',
