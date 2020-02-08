@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Order = require('../models/order');
 const generatePdf = require('../utils/generatePdf');
 
 function billingController() {
@@ -6,14 +7,21 @@ function billingController() {
     const generateInvoice = async (req, res) => {
         let orderId;
         let invoiceDate;
+        let userEmail;
         try {
-            const user = await User.findOne({ _id: req.params.id }).populate({
-                path: 'orders',
-                populate: { path: 'eventId' }
+
+            const order = await Order.findOne({ _id: req.params.id })
+            .populate({
+                path: 'eventId'
+            })
+            .populate({
+                path: 'userId'
             });
-            console.log(user);
-            orderId = user.id;
-            invoiceDate = user.orders[0].purchaseDate;
+
+            console.log(order);
+            orderId = order.id;
+            invoiceDate = order.purchaseDate;
+            userEmail = order.userId.email;
         }
         catch (err) {
             return res.status(500).send(err);
@@ -101,7 +109,8 @@ function billingController() {
             }
         };
 
-        generatePdf(docDefinition, (response) => {
+        //ToDo: Make it async
+         generatePdf(docDefinition, (response) => {
             res.contentType('application/pdf');
             res.setHeader('Content-disposition', `attachment; filename=${orderId}.pdf`)
 

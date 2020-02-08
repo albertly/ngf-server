@@ -23,7 +23,7 @@ const eventController = require('../controllers/eventController');
 
 chai.use(chaiHttp);
 
-describe('Event Controller Tests:', () => {
+describe.skip('Event Controller Tests:', () => {
     let res = null;
     let controller = null;
     const event = require('../database/events')[0];
