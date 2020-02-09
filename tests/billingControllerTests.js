@@ -21,21 +21,24 @@ describe('Billing Controller Tests:', () => {
 
         const req = {
             params: {
-                id: '5ded532b127cec2bec7b0e6c'
+                id: '5ddfad88733705f1beafe999'
+                //id: '5ded532b127cec2bec7b0e6c'
             }
         };
 
-        let resData;
+        //let resData;
         const res = {
-            contentType: () => { },
-            setHeader: () => { },
-            send: response => { 
-                resData = response 
-            },
+            contentType: sinon.spy(),
+            setHeader: sinon.spy(),
+            send: sinon.spy(),
         };
 
         await billingController.generateInvoice(req, res);
+        
+        res.contentType.alwaysCalledWith('application/pdf');
+        res.send.args[0][0].byteLength.should.be.gt(1000);
 
+        return;
         const order = await Order.findOne({ _id: '5ded532b127cec2bec7b0e6c' })
             .populate({
                 path: 'eventId'

@@ -11,12 +11,12 @@ function billingController() {
         try {
 
             const order = await Order.findOne({ _id: req.params.id })
-            .populate({
-                path: 'eventId'
-            })
-            .populate({
-                path: 'userId'
-            });
+                .populate({
+                    path: 'eventId'
+                })
+                .populate({
+                    path: 'userId'
+                });
 
             console.log(order);
             orderId = order.id;
@@ -110,12 +110,12 @@ function billingController() {
         };
 
         //ToDo: Make it async
-         generatePdf(docDefinition, (response) => {
-            res.contentType('application/pdf');
-            res.setHeader('Content-disposition', `attachment; filename=${orderId}.pdf`)
+        response = await generatePdf(docDefinition); //, (response) => {
+        res.contentType('application/pdf');
+        res.setHeader('Content-disposition', `attachment; filename=${orderId}.pdf`)
 
-            res.send(response); // sends a base64 encoded string to client
-        });
+        res.send(response); // sends a base64 encoded string to client
+        //});
     };
 
     return { generateInvoice };
