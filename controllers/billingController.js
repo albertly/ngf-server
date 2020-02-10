@@ -1,15 +1,16 @@
 const User = require('../models/user');
 const Order = require('../models/order');
 const generatePdf = require('../utils/generatePdf');
+const moment = require('moment');
 
 function billingController() {
 
     const generateInvoice = async (req, res) => {
         let orderId;
-        let invoiceDate;
+        let invoiceDate = '';
         let userEmail;
         try {
-
+            req.params.id = '5ddfad88733705f1beafe999';
             const order = await Order.findOne({ _id: req.params.id })
                 .populate({
                     path: 'eventId'
@@ -19,8 +20,13 @@ function billingController() {
                 });
 
             console.log(order);
+            //var format = moment.localeData.longDateFormat('LL');
             orderId = order.id;
-            invoiceDate = order.purchaseDate;
+
+            tmpDate = moment(order.purchaseDate);
+            invoiceDate = `${tmpDate.day()}\\${tmpDate.month()}\\${tmpDate.year()}`;
+            //  const z = tmpDate.format('DD-MM-YYYY'); ? bug
+
             userEmail = order.userId.email;
         }
         catch (err) {
@@ -36,13 +42,21 @@ function billingController() {
                 {
                     columns: [
                         {
-                            width: 80,
-                            text: 'Ng-Event'
+                            width: 60,
+                            image: 'fonts/logo.png'
                         },
                         {
                             width: '*',
-                            text: `Invoice Date:  ${invoiceDate} \n
-                     Invoice #:  ${orderId}`
+                            alignment: 'right',
+                            stack: [
+                                {
+                                    text: `Invoice Date:  ${invoiceDate}`,
+                                },
+                                {
+                                    text: `Invoice #:  ${orderId}`,
+                                }
+                            ]
+
                         }
                     ]
                 },
